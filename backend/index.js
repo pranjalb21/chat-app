@@ -34,11 +34,12 @@ io.on("connection", (socket) => {
 
     socket.on("send_message", async (data) => {
         const { sender, receiver, message } = data;
+        console.log(sender, receiver, message);
+
         const newMessage = new Message({ sender, receiver, message });
         await newMessage.save();
+        socket.broadcast.emit("receive_message", data);
     });
-
-    socket.broadcast.emit("receive_message", data);
 
     socket.on("disconnect", () => {
         console.log("User disconnected.", socket.id);
@@ -49,7 +50,10 @@ app.get("/messages", async (req, res) => {
     try {
         const { sender, receiver } = req.query;
         const messages = await Message.find({
-            $or: [{ sender, receiver }, { receiver: sender }],
+            $or: [
+                { sender, receiver },
+                { sender: receiver, receiver: sender },
+            ],
         }).sort({ createdAt: 1 });
         res.status(200).json(messages);
     } catch (error) {
@@ -69,6 +73,6 @@ app.get("/users", async (req, res) => {
 
 const PORT = process.env.PORT || 5001;
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log("Server is running on port", PORT);
 });
