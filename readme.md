@@ -51,4 +51,5 @@ This is a basic chat application with user login, register, chat window features
     ☑ Once an user logs in messages for the same user needs to be fetched.
 
 -   **Users Route**
+
     ☑ In this route all the available user needs to be fetched.
